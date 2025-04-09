@@ -1,0 +1,7 @@
+indicatorId,name,theme,lastDataUpdate,lastDataUpdateDescription,dataAvailability.totalRecordCount,dataAvailability.timeLine.min,dataAvailability.timeLine.max,dataAvailability.geoUnits.types,disaggregations,glossaryTerms
+200101,Total population (thousands),DEMOGRAPHIC_SOCIOECONOMIC,2025-02-23,February 2025 Data Release,12356,1970,2023,NATIONAL,,
+SH.DYN.AIDS.ZS,"Prevalence of HIV, total (% of population ages 15-49)",DEMOGRAPHIC_SOCIOECONOMIC,2025-02-23,February 2025 Data Release,4801,1990,2022,NATIONAL,,
+SP.DYN.IMRT.IN,"Mortality rate, infant (per 1,000 live births)",DEMOGRAPHIC_SOCIOECONOMIC,2025-02-23,February 2025 Data Release,9965,1970,2022,NATIONAL,,
+SP.DYN.LE00.IN,"Life expectancy at birth, total (years)",DEMOGRAPHIC_SOCIOECONOMIC,2025-02-23,February 2025 Data Release,11001,1970,2022,NATIONAL,,
+SP.DYN.TFRT.IN,"Fertility rate, total (births per woman)",DEMOGRAPHIC_SOCIOECONOMIC,2025-02-23,February 2025 Data Release,11012,1970,2022,NATIONAL,,
+SP.POP.GROW,Population growth (annual %),DEMOGRAPHIC_SOCIOECONOMIC,2025-02-23,February 2025 Data Release,11641,1970,2023,NATIONAL,,
