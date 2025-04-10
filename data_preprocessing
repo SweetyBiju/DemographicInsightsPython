@@ -1,0 +1,104 @@
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error,mean_absolute_error, r2_score
+
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.model_selection import train_test_split
+from scipy.stats import skew
+import warnings
+warnings.filterwarnings('ignore')
+
+
+plt.rc('font', family='Arial')
+
+
+# Load datasets
+indicators_df = pd.read_csv("D:/data_python/pyproject/indicator_values.csv")
+indicator_mapping = pd.read_csv("D:/data_python/pyproject/indicator_codes.csv")
+country_mapping = pd.read_csv("D:/data_python/pyproject/country_codes1.csv", encoding='latin1')
+gdp_df = pd.read_csv("D:/data_python/pyproject/gdp.csv")
+
+# Select and rename columns
+indicators_df = indicators_df[['indicatorId', 'geoUnit', 'year', 'value']]
+indicator_mapping = indicator_mapping[['indicatorId', 'name']].rename(columns={'name': 'indicatorName'})
+country_mapping = country_mapping.rename(columns={'countryname': 'countryName'})
+gdp_df = gdp_df[['geoUnit', 'year', 'value']].rename(columns={'value': 'gdpValue'})
+
+# Merge datasets
+df = pd.merge(indicators_df, indicator_mapping, on='indicatorId', how='left')
+df = pd.merge(df, country_mapping, on='geoUnit', how='left')
+df_pivot = df.pivot_table(index=['geoUnit', 'countryName', 'year'], columns='indicatorName', values='value').reset_index()
+final_df = pd.merge(df_pivot, gdp_df, on=['geoUnit', 'year'], how='left')
+
+# Standardize column names
+final_df.columns = [''.join(word.capitalize() for word in col.replace(',', ' ').replace('(', ' ').replace(')', ' ').split()) 
+                   for col in final_df.columns]
+
+# Initial info before handling missing values
+print("\nInitial Dataset Info:")
+print(final_df.info())
+
+# Drop 2023
+final_df = final_df[final_df['Year'] != 2023]
+
+# Define numeric columns
+numeric_cols = [
+    'PrevalenceOfHivTotal%OfPopulationAges15-49',
+    'MortalityRateInfantPer1000LiveBirths',
+    'LifeExpectancyAtBirthTotalYears',
+    'FertilityRateTotalBirthsPerWoman',
+    'PopulationGrowthAnnual%',
+    'TotalPopulationThousands',
+    'Gdpvalue'
+]
+
+# Step 1: Fill missing values by country based on skewness
+for col in numeric_cols:
+    if col == 'LifeExpectancyAtBirthTotalYears':
+        final_df[col] = final_df.groupby('Countryname')[col].transform(lambda x: x.fillna(x.mean()))  # Mean for low skew
+    else:
+        final_df[col] = final_df.groupby('Countryname')[col].transform(lambda x: x.fillna(x.median()))  # Median for high skew
+
+# Step 2: Interpolate remaining NaNs within each country over time
+final_df = final_df.sort_values(['Countryname', 'Year'])  # Sort for interpolation
+for col in numeric_cols:
+    final_df[col] = final_df.groupby('Countryname')[col].transform(lambda x: x.interpolate(method='linear'))
+
+# Step 3: Fill any remaining NaNs with global median (if no country data exists)
+for col in numeric_cols:
+    final_df[col] = final_df[col].fillna(final_df[col].median())
+
+# Ensure data types
+final_df['Year'] = final_df['Year'].astype(int)
+for col in numeric_cols:
+    final_df[col] = pd.to_numeric(final_df[col], errors='coerce')
+
+
+
+# Load continent mapping from Excel
+continent_df = pd.read_csv("D:/data_python/pyproject/continent_mapping.csv", encoding='latin1')  # Adjust path if different
+continent_df = continent_df[['CountryName', 'Continent']]  # Select relevant columns
+continent_df = continent_df.rename(columns={'CountryName': 'Countryname'})  # Match final_df's column name
+
+# Merge continent data with final_df
+final_df = pd.merge(final_df, continent_df, on='Countryname', how='left')
+
+# Fill any unmatched countries with 'Other' (optional, if some countries aren't in continent_df)
+final_df['Continent'] = final_df['Continent'].fillna('Other')
+
+
+
+
+# Info after handling missing values
+print("\nDataset Info After Handling Missing Values:")
+print(final_df.info())
+print("\nDataset Description:")
+print(final_df.describe())
+print("\nFirst 5 Rows:")
+print(final_df.head())
+print("\nLast 5 Rows:")
+print(final_df.tail())
