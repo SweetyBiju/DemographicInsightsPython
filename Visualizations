@@ -1,0 +1,19 @@
+# Objective 1: Correlation heatmap
+plt.figure(figsize=(12,10))
+numeric_df = final_df.select_dtypes(include=[np.number])
+sns.heatmap(numeric_df.corr(), annot=True, cmap='RdBu_r',center=0,annot_kws={"size":12})
+plt.title('Correlation Heatmap of Global Indicators',fontsize=14)
+plt.tight_layout()
+plt.show()
+
+# Objective 2: Population growth trends
+plt.figure(figsize=(16, 8))
+top_countries = final_df.groupby('Countryname')['TotalPopulationThousands'].max().nlargest(5).index
+pop_data = final_df[final_df['Countryname'].isin(top_countries)]
+sns.lineplot(data=pop_data, x='Year', y='PopulationGrowthAnnual%', hue='Countryname', palette='Set2', linewidth=2.5,markers=True)
+plt.grid(True,which='both', linestyle='--', alpha=0.7)
+plt.title('Population Growth Trends for Top 5 Populous Countries',fontsize=14)
+plt.xlabel('Year',fontsize=12)
+plt.ylabel('Annual Population Growth (%)',fontsize=12)
+plt.legend(title='Country',title_fontsize=12, fontsize=10)
+plt.show()
