@@ -1,0 +1,21 @@
+# Objective 3: GDP per Capita vs Life Expectancy
+plt.figure(figsize=(16,9))
+sns.scatterplot(data=final_df, x='Gdpvalue', y='LifeExpectancyAtBirthTotalYears', 
+                size='TotalPopulationThousands', hue='Continent', palette='deep', s=100)
+plt.title('GDP per Capita vs Life Expectancy Across Countries by Continent', fontsize=14)
+plt.xscale('log')
+plt.xlabel('GDP per Capita (log scale)', fontsize=12)
+plt.ylabel('Life Expectancy (Years)', fontsize=14)
+plt.legend(title='Continent', bbox_to_anchor=(1.05,1),loc='upper left', fontsize=10) 
+plt.grid(True, linestyle='--', alpha=0.5) 
+plt.tight_layout()
+plt.show()
+
+# Objective 4: Infant mortality distribution
+plt.figure(figsize=(16,9))
+sns.boxplot(data=final_df, x='Year', y='MortalityRateInfantPer1000LiveBirths',palette='magma')
+plt.title('Global Infant Mortality Rate Distribution (2000-2022)', fontsize=14)
+plt.xticks( rotation=45)
+plt.xlabel('Year',fontsize=12)
+plt.ylabel('Infant Mortality Rate (per 1000 Live Births)',fontsize=12)
+plt.show()
