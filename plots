@@ -1,0 +1,44 @@
+# Objective 5: HIV prevalence in India
+plt.figure(figsize=(16,9))
+sns.lineplot(data=final_df[final_df['Countryname'] == 'India'], 
+             x='Year', y='PrevalenceOfHivTotal%OfPopulationAges15-49', marker='o',markersize=8, color='blue', linewidth=2.5)
+plt.title('HIV Prevalence Trend in India (2000-2022)')
+plt.xlabel('Year', fontsize=12)
+plt.ylabel('HIV Prevalence (% of Population Ages 15-49)', fontsize=12)
+plt.xticks(np.arange(2000, 2023, 5))
+plt.grid(True, linestyle='--', alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+# Objective 6: Fertility rate trends
+top_gdp = final_df[final_df['Year']==2022].groupby('Countryname')['Gdpvalue'].max().nlargest(5).index
+plt.figure(figsize=(16,9))
+sns.lineplot(data=final_df[final_df['Countryname'].isin(top_gdp)], 
+             x='Year', y='FertilityRateTotalBirthsPerWoman', hue='Countryname', 
+             style='Countryname', markers=True, palette='husl', markersize=8, linewidth=2)
+plt.title('Fertility Rate Trends in Top 5 GDP per Capita Countries (2000-2022)', fontsize=14)
+plt.xlabel('Year', fontsize=12)
+plt.ylabel('Fertility Rate (Births per Woman)', fontsize=12)
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', title='Country', title_fontsize=12, fontsize=10)  
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.xticks(range(2000, 2023, 2))
+plt.tight_layout()
+plt.show()
+
+
+
+# Objective 7: Skewness with histogram + KDE
+print("\nSkewness of Key Indicators:")
+plt.figure(figsize=(16,9))
+for i, col in enumerate(numeric_cols, 1):
+    plt.subplot(3, 3, i)
+    sns.histplot(data=final_df[col],bins=30, kde=True, color='blue', label='Distribution')
+    plt.axvline(final_df[col].mean(), color='red', linestyle='--', label='Mean')
+    plt.axvline(final_df[col].median(), color='green', linestyle='--', label='Median')
+    skewness_value = skew(final_df[col].dropna())
+    plt.title(f'{col} (Skew: {skewness_value:.2f})')
+    plt.legend(fontsize=10)
+plt.tight_layout()
+plt.show()
+for col in numeric_cols:
+    print(f"{col}: Skewness = {skew(final_df[col].dropna()):.4f}")
